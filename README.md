@@ -11,8 +11,9 @@ progress towards implementation and demo software for MPEG-I SD support in THREE
 https://nodejs.org/en/download
 ```
 
-2. nagivate to this repository
+2. clone this repository
 ```
+git clone https://github.com/inealey/threejs-mpeg-extensions.git
 cd threejs-mpeg-extentions
 ```
 
@@ -21,9 +22,9 @@ cd threejs-mpeg-extentions
 npm install
 ```
 
-4. run HTTP server
+4. start HTTP server
 ```
 npm start
 ```
 
-5. browse to 127.0.0.1:8080
+5. browse to `127.0.0.1:8080`
