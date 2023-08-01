@@ -1,0 +1,11 @@
+{
+  "devDependencies": {
+    "concurrently": "^8.2.0",
+    "http-server": "^14.1.1",
+    "three": "^0.154.0"
+  },
+  "scripts": {
+    "start": "npm run open",
+    "open": "concurrently \"http-server -a 0.0.0.0 -p 8080 -c-1\""
+  }
+}
