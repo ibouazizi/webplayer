@@ -6,7 +6,7 @@ progress towards implementation and demo software for MPEG-I SD support in THREE
 
 ### Demo:
 
-#### 1. Install Node.js with npm
+#### 1. Install Node.js / npm
 ```
 https://nodejs.org/en/download
 ```
