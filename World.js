@@ -39,7 +39,7 @@ class World {
         // ********** CONTROLS **********
         // create a controls object that uses default camera
         // need to update if glTF provides camera
-        // TODO: how to set lookAt target?
+        // TODO: set lookAt target?
         // can swap in controls from three/addons/controls/
         controls = new OrbitControls( camera, renderer.domElement );
 
@@ -88,11 +88,11 @@ class World {
         const gltfLoader = new GLTFLoader();
         gltfLoader.setPath( 'gltf/livingRoomEXT/video/' );
         gltfLoader.register( parser => new GLTFMPEGMediaExtension( parser )); // register MPEG_media extention
-        //gltfLoader.register( parser => new GLTFMPEGTextureVideoExtension( parser )); // register MPEG_texture_video extension
+        gltfLoader.register( parser => new GLTFMPEGTextureVideoExtension( parser )); // register MPEG_texture_video extension
         const glTFData = await gltfLoader.loadAsync( 'scene.360p48k.gltf' );
         // const glTFData = await gltfLoader.loadAsync( 'test.gltf' );
 
-        //console.log( glTFData );
+        console.log( glTFData );
 
         // if glTF provided a camera(s), use it for rendering and controls
         // TODO: some way to cycle through if there are > 1 ?

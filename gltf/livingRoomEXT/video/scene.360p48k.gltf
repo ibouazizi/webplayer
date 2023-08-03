@@ -2766,14 +2766,14 @@
 				{
 					"alternatives": [
 						{
-							"mimeType": "application/mp4",
+							"mimeType": "video/mp4",
 							"tracks": [
 								{
-									"codecs": "0x31637661;",
+									"codecs": "avc1.42401E",
 									"track": "#track_ID=1"
 								},
 								{
-									"codecs": "audio/mp4a",
+									"codecs": "mp4a.40.2",
 									"track": "#track_ID=2"
 								}
 							],
@@ -2781,7 +2781,7 @@
 						}
 					],
 					"autoplay": true,
-					"autoplayGroup": false,
+					"autoplayGroup": 0,
 					"controls": false,
 					"endTimeOffset": 0,
 					"loop": true,
