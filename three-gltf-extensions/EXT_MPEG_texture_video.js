@@ -1,3 +1,31 @@
+import {
+    ClampToEdgeWrapping,
+    LinearFilter,
+    LinearMipmapLinearFilter,
+    LinearMipmapNearestFilter,
+    MirroredRepeatWrapping,
+    NearestFilter,
+    NearestMipmapNearestFilter,
+    NearestMipmapLinearFilter,
+    RepeatWrapping,
+    VideoTexture
+  } from 'three';
+
+const WEBGL_FILTERS = {
+    9728: NearestFilter,
+    9729: LinearFilter,
+    9984: NearestMipmapNearestFilter,
+    9985: LinearMipmapNearestFilter,
+    9986: NearestMipmapLinearFilter,
+    9987: LinearMipmapLinearFilter
+  };
+  
+  const WEBGL_WRAPPINGS = {
+    33071: ClampToEdgeWrapping,
+    33648: MirroredRepeatWrapping,
+    10497: RepeatWrapping
+  };
+
 /**
  *   MPEG_texture_video extension
  *   spec: https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Vendor/MPEG_texture_video
@@ -8,16 +36,39 @@
  */
 export default class GLTFMPEGTextureVideoExtension {
 
-    constructor( parser ) {
+    constructor( parser, gltf ) {
         this.name = 'MPEG_texture_video';
         this.parser = parser;
     }
 
-    // called during parse by GLTFLoader
-    afterRoot( gltf ) {
-        
-        // implementation here
-       // console.log( this.parser );
-        console.log( gltf );
+    
+    loadTexture( textureIndex ) {
+
+        const parser = this.parser;
+		const json = parser.json;
+
+        const textureDef = json.textures[ textureIndex ];
+
+        if ( !textureDef.extensions || !textureDef.extensions[ this.name ] ) {
+			return null;
+		}
+
+        const extensionDef = textureDef.extensions[ this.name ];
+        // console.log( extensionDef );
+
+        // console.log( 'index:', textureIndex );
+        // console.log( parser );
     }
+    
+    // // called once during parse by GLTFLoader
+    // afterRoot( gltf ) {
+    //     console.log( 'foo2' );
+    // }
+    
 }
+
+/**
+ *   REFERENCE:
+ *   https://threejs.org/docs/#api/en/textures/VideoTexture
+ *   https://github.com/takahirox/three-gltf-extensions/blob/main/loaders/EXT_texture_video/EXT_texture_video.js
+ */

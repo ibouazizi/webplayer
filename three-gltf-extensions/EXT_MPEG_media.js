@@ -179,7 +179,7 @@ export default class GLTFMPEGMediaExtension {
 
                                 }
                                 else {
-                                    console.warn( 'MPEG_media.media.alternative: unsupported mimeType');
+                                    console.warn( 'MPEG_media.media.alternative: unsupported codec');
                                 }
                             }
                             break;
