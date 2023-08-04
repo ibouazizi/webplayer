@@ -92,7 +92,7 @@ class World {
         const glTFData = await gltfLoader.loadAsync( 'scene.360p48k.gltf' );
         // const glTFData = await gltfLoader.loadAsync( 'test.gltf' );
 
-        console.log( glTFData );
+        // console.log( glTFData );
 
         // if glTF provided a camera(s), use it for rendering and controls
         // TODO: some way to cycle through if there are > 1 ?

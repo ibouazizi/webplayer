@@ -175,7 +175,7 @@ export default class GLTFMPEGMediaExtension {
                                     source.setAttribute( 'type', mimeCodecString );
                                     currentMediaElement.appendChild( source ); // add to html video element
 
-                                    console.log( currentMediaElement );
+                                    // console.log( currentMediaElement );
 
                                 }
                                 else {

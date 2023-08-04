@@ -45,16 +45,32 @@ export default class GLTFMPEGTextureVideoExtension {
     loadTexture( textureIndex ) {
 
         const parser = this.parser;
-		const json = parser.json;
+		    const json = parser.json;
 
         const textureDef = json.textures[ textureIndex ];
 
         if ( !textureDef.extensions || !textureDef.extensions[ this.name ] ) {
-			return null;
-		}
+			    return null;
+		    }
+
+        // console.log( json );
 
         const extensionDef = textureDef.extensions[ this.name ];
-        // console.log( extensionDef );
+        //console.log( extensionDef );
+        
+        const accessorIndex = extensionDef.accessor;
+        const accessor = json.accessors[ accessorIndex ];
+        const bufferViewIndex = accessor.bufferView;
+        const bufferView = json.bufferViews[ bufferViewIndex ];
+        const bufferIndex = bufferView.buffer;
+        const buffer = json.buffers[ bufferIndex ];
+
+        console.log( buffer.extensions.MPEG_buffer_circular.media );
+
+        console.log( document );
+        console.log( document.getElementById( "MPEG_media_0" ) );
+
+        //console.log( json.bufferViews );
 
         // console.log( 'index:', textureIndex );
         // console.log( parser );
