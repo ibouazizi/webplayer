@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2023-08-07T18:13:56.357Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36" etag="A_q9Z5kigoKMyyNbPqD8" version="21.6.6" type="github" pages="4">
+<mxfile host="app.diagrams.net" modified="2023-08-07T18:14:59.403Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36" etag="7oxkLVQLlt8ZQY6uwHi6" version="21.6.6" type="github" pages="4">
   <diagram id="C5RBs43oDa-KdzZeNtuy" name="project overview">
     <mxGraphModel dx="1510" dy="1441" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
       <root>
@@ -615,7 +615,7 @@
     </mxGraphModel>
   </diagram>
   <diagram id="_jKAG3DPXsn0UD8yXdjF" name="MPEG_audio_spatial">
-    <mxGraphModel dx="1057" dy="1009" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+    <mxGraphModel dx="1244" dy="1187" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -751,15 +751,15 @@
         <mxCell id="dy3YlAJVlz9nDloOwajc-38" value="            MPEG_audio_spatial" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=14;" vertex="1" parent="dy3YlAJVlz9nDloOwajc-31">
           <mxGeometry y="206" width="210" height="34" as="geometry" />
         </mxCell>
-        <mxCell id="dy3YlAJVlz9nDloOwajc-39" value="GLTF MPEG audio spatial extension " style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rounded=0;shadow=0;strokeWidth=1;fillColor=#fad7ac;strokeColor=#b46504;fontSize=14;" vertex="1" parent="1">
+        <mxCell id="dy3YlAJVlz9nDloOwajc-39" value="GLTF MPEG audio spatial extension " style="swimlane;fontStyle=0;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rounded=0;shadow=0;strokeWidth=1;fillColor=#ffff88;strokeColor=#36393d;fontSize=14;" vertex="1" parent="1">
           <mxGeometry x="520" y="681" width="250" height="89" as="geometry">
             <mxRectangle x="220" y="120" width="160" height="26" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="dy3YlAJVlz9nDloOwajc-40" value="parser" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rounded=0;shadow=0;html=0;fillColor=#fad7ac;strokeColor=#b46504;fontSize=14;" vertex="1" parent="dy3YlAJVlz9nDloOwajc-39">
+        <mxCell id="dy3YlAJVlz9nDloOwajc-40" value="parser" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rounded=0;shadow=0;html=0;fillColor=#ffff88;strokeColor=#36393d;fontSize=14;" vertex="1" parent="dy3YlAJVlz9nDloOwajc-39">
           <mxGeometry y="26" width="250" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="dy3YlAJVlz9nDloOwajc-41" value="loadNode()" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=14;" vertex="1" parent="dy3YlAJVlz9nDloOwajc-39">
+        <mxCell id="dy3YlAJVlz9nDloOwajc-41" value="loadNode()" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=14;fillColor=none;" vertex="1" parent="dy3YlAJVlz9nDloOwajc-39">
           <mxGeometry y="52" width="250" height="34" as="geometry" />
         </mxCell>
         <mxCell id="dy3YlAJVlz9nDloOwajc-42" style="edgeStyle=orthogonalEdgeStyle;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.75;entryY=0;entryDx=0;entryDy=0;fillColor=#b1ddf0;strokeColor=#10739e;fontSize=14;" edge="1" parent="1" source="dy3YlAJVlz9nDloOwajc-7" target="dy3YlAJVlz9nDloOwajc-31">
@@ -781,7 +781,7 @@
         <mxCell id="dy3YlAJVlz9nDloOwajc-45" value="    THREE.PositionalAudio()" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=18;" vertex="1" parent="1">
           <mxGeometry x="161.43" y="520" width="230" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="dy3YlAJVlz9nDloOwajc-46" style="edgeStyle=orthogonalEdgeStyle;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.516;entryY=1;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="dy3YlAJVlz9nDloOwajc-41" target="dy3YlAJVlz9nDloOwajc-45">
+        <mxCell id="dy3YlAJVlz9nDloOwajc-46" style="edgeStyle=orthogonalEdgeStyle;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.516;entryY=1;entryDx=0;entryDy=0;entryPerimeter=0;fillColor=#ffff88;strokeColor=#36393d;" edge="1" parent="1" source="dy3YlAJVlz9nDloOwajc-41" target="dy3YlAJVlz9nDloOwajc-45">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="dy3YlAJVlz9nDloOwajc-47" value="MPEG_audio_spatial extension (with embedded MPEG_media)" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=29;" vertex="1" parent="1">
