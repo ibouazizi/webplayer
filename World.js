@@ -3,10 +3,11 @@ import { Loop } from "./Loop.js";
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
-//import { PositionalAudioHelper } from 'three/addons/helpers/PositionalAudioHelper.js';
+import Stats  from 'three/addons/libs/stats.module.js';
 import GLTFMPEGMediaExtension from './three-gltf-extensions/EXT_MPEG_media.js';
 import GLTFMPEGTextureVideoExtension from './three-gltf-extensions/EXT_MPEG_texture_video.js';
-import Stats  from 'three/addons/libs/stats.module.js';
+import GLTFMPEGAudioSpatialExtension from './three-gltf-extensions/EXT_MPEG_audio_spatial.js';
+
 
 // module scoped
 let camera, scene, renderer, loop, controls;
@@ -89,10 +90,8 @@ class World {
         gltfLoader.setPath( 'gltf/livingRoomEXT/video/' );
         gltfLoader.register( parser => new GLTFMPEGMediaExtension( parser )); // register MPEG_media extention
         gltfLoader.register( parser => new GLTFMPEGTextureVideoExtension( parser )); // register MPEG_texture_video extension
+        gltfLoader.register( parser => new GLTFMPEGAudioSpatialExtension( parser )); // register MPEG_audio_spatial extension
         const glTFData = await gltfLoader.loadAsync( 'scene.360p48k.gltf' );
-        // const glTFData = await gltfLoader.loadAsync( 'test.gltf' );
-
-        // console.log( glTFData );
 
         // if glTF provided a camera(s), use it for rendering and controls
         // TODO: some way to cycle through if there are > 1 ?
@@ -102,7 +101,8 @@ class World {
 
         // add the full gltf scene to THREE scene
         scene.add( glTFData.scene );
-        scene.updateMatrixWorld();  // !! manually update world matrices !!
+        // !! manually update world matrices !!
+        scene.updateMatrixWorld();
 
 
         // ********** GRID HELPER **********
@@ -138,10 +138,11 @@ class World {
     // update current camera parameters with another camera
     updateWorldCamera( newCamera ) {
         // copy children to new camera (i.e. audioListener)
-        let children = camera.children;
+        // don't copy children anymore - gltfLoader attached listener to camera[0]?
+        // let children = camera.children;
         camera = newCamera;
         camera.parent = null;        // break camera out of node graph
-        camera.children = children;  
+        // camera.children = children;  
         loop.camera = camera;        // update loop camera
         controls.object = camera;    // use current controller for this camera
         this.onWindowResize();
@@ -159,6 +160,12 @@ class World {
                 // console.log( camera );
                 break;
 
+            // print camera info to console when C is pressed
+            case 'KeyC':
+                console.log( camera );
+                // console.log( controls );
+                // console.log( camera );
+                break;
         }
     }
 }

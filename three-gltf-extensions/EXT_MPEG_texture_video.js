@@ -36,11 +36,10 @@ const WEBGL_FILTERS = {
  */
 export default class GLTFMPEGTextureVideoExtension {
 
-    constructor( parser, gltf ) {
+    constructor( parser ) {
         this.name = 'MPEG_texture_video';
         this.parser = parser;
     }
-
     
     loadTexture( textureIndex ) {
 
@@ -73,7 +72,6 @@ export default class GLTFMPEGTextureVideoExtension {
 
             // TODO: play if not already playing?
             if( video.autoplay == false ) {
-                console.log( "no autoplay" );
                 video.play();
             }
 
