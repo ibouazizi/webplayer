@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2023-08-07T17:58:20.267Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36" etag="fXbxIQ-NMGN1_G8dIKdp" version="21.6.6" type="github" pages="3">
+<mxfile host="app.diagrams.net" modified="2023-08-07T18:10:51.649Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36" etag="JfmgmL-8XQGI0FjxYNzj" version="21.6.6" type="github" pages="3">
   <diagram id="C5RBs43oDa-KdzZeNtuy" name="project overview">
     <mxGraphModel dx="1510" dy="1441" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
       <root>
@@ -159,7 +159,7 @@
     </mxGraphModel>
   </diagram>
   <diagram id="YPXxy7g2ebmNAlH5daJt" name="MPEG_media">
-    <mxGraphModel dx="1244" dy="1187" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" math="0" shadow="0">
+    <mxGraphModel dx="2114" dy="2018" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -430,7 +430,7 @@
     </mxGraphModel>
   </diagram>
   <diagram id="1ToWGSbz7VSFsPuKmxJ_" name="MPEG_texture_video">
-    <mxGraphModel dx="1090" dy="1441" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+    <mxGraphModel dx="1510" dy="1441" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -583,11 +583,13 @@
         <mxCell id="ovgltmCuExjy6_qMfR2y-8" style="edgeStyle=orthogonalEdgeStyle;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.96;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;fillColor=#b0e3e6;strokeColor=#0e8088;" edge="1" parent="1" source="qrq5B8UmVfHPtOx9VMOz-49" target="qrq5B8UmVfHPtOx9VMOz-37">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="ovgltmCuExjy6_qMfR2y-11" style="edgeStyle=orthogonalEdgeStyle;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;fillColor=#fad9d5;strokeColor=#ae4132;strokeWidth=3;dashed=1;dashPattern=1 4;" edge="1" parent="1" source="ovgltmCuExjy6_qMfR2y-6" target="qrq5B8UmVfHPtOx9VMOz-3">
+        <mxCell id="hS_j7D74UbFISulxlsdS-6" style="edgeStyle=orthogonalEdgeStyle;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fillColor=#fad9d5;strokeColor=#ae4132;strokeWidth=3;dashed=1;dashPattern=1 4;" edge="1" parent="1" source="ovgltmCuExjy6_qMfR2y-6" target="hS_j7D74UbFISulxlsdS-3">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="420" y="540" />
-              <mxPoint x="420" y="223" />
+              <mxPoint x="411" y="540" />
+              <mxPoint x="411" y="480" />
+              <mxPoint x="270" y="480" />
+              <mxPoint x="270" y="382" />
             </Array>
           </mxGeometry>
         </mxCell>
@@ -597,8 +599,17 @@
         <mxCell id="ovgltmCuExjy6_qMfR2y-9" style="edgeStyle=orthogonalEdgeStyle;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.516;entryY=1;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="qrq5B8UmVfHPtOx9VMOz-39" target="ovgltmCuExjy6_qMfR2y-6">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="9HEMJ1N5cpXH65KmGYrx-1" value="MPEG_texture_video extension (with  embedded media)" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=29;" vertex="1" parent="1">
+        <mxCell id="9HEMJ1N5cpXH65KmGYrx-1" value="MPEG_texture_video extension (with embedded MPEG_media)" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=29;" vertex="1" parent="1">
           <mxGeometry x="240" width="430" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="hS_j7D74UbFISulxlsdS-4" style="edgeStyle=orthogonalEdgeStyle;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fillColor=#fad9d5;strokeColor=#ae4132;strokeWidth=3;dashed=1;dashPattern=1 4;" edge="1" parent="1" source="hS_j7D74UbFISulxlsdS-3" target="qrq5B8UmVfHPtOx9VMOz-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="hS_j7D74UbFISulxlsdS-3" value="imported scene" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=18;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="310" y="362" width="140" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="hS_j7D74UbFISulxlsdS-5" style="edgeStyle=orthogonalEdgeStyle;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.58;entryY=1.022;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="qrq5B8UmVfHPtOx9VMOz-34" target="hS_j7D74UbFISulxlsdS-3">
+          <mxGeometry relative="1" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
