@@ -53,8 +53,6 @@ export default class GLTFMPEGTextureVideoExtension {
 			    return null;
 		    }
 
-        // console.log( json );
-
         const extensionDef = textureDef.extensions[ this.name ];
         //console.log( extensionDef );
         
@@ -67,20 +65,17 @@ export default class GLTFMPEGTextureVideoExtension {
 
         console.log( buffer.extensions.MPEG_buffer_circular.media );
 
-        console.log( document );
-        console.log( document.getElementById( "MPEG_media_0" ) );
+        // DEBUGGING - creating video element here instead
+        const video = document.createElement( 'video' );
 
-        //console.log( json.bufferViews );
-
-        // console.log( 'index:', textureIndex );
-        // console.log( parser );
+        return new Promise( resolve => {
+            video.src = './gltf/livingRoomEXT/video/bbb_360p_48k.mp4';
+            video.play();
+            const texture = new VideoTexture( video );
+            texture.flipY = false;
+            resolve( texture );
+        });
     }
-    
-    // // called once during parse by GLTFLoader
-    // afterRoot( gltf ) {
-    //     console.log( 'foo2' );
-    // }
-    
 }
 
 /**

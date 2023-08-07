@@ -188,6 +188,8 @@ export default class GLTFMPEGMediaExtension {
             }
             // add HTML video element to array of MPEG media in the returned object
             gltf.userData.gltfExtensions[ 'MPEG_media' ].push( currentMediaElement );
+
+            // add HTML element to document body
             document.body.appendChild( currentMediaElement );
             mediaIndex++;
         }
