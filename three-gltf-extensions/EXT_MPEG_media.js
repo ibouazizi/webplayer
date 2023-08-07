@@ -16,7 +16,8 @@ export default class GLTFMPEGMediaExtension {
     }
 
     // called during parse by GLTFLoader
-    afterRoot( gltf ) {
+    // populate media before traversing scene graph
+    beforeRoot(  ) {
         const parser = this.parser;
         const json = parser.json;
 
@@ -32,14 +33,6 @@ export default class GLTFMPEGMediaExtension {
             console.warn( 'MPEG_media: missing required property "media" ' );
             return null;
         }
-
-        // create an array of media items under .userData.gltfExtensions
-        // following the convention at: https://threejs.org/docs/#examples/en/loaders/GLTFLoader
-        // see "custom extensions"
-        // in addition to the metadata from the glTF, we will populate with HTML elements 
-        // corresponding to the media items
-        gltf.userData.gltfExtensions = {};
-        gltf.userData.gltfExtensions[ 'MPEG_media' ] =  [];
 
         let mediaIndex = 0; // for naming the HTML elements
 
@@ -83,6 +76,7 @@ export default class GLTFMPEGMediaExtension {
 
                     switch ( key ) {
 
+                        // TODO: force enumerated media ids? or allow custom names?
                         case 'name':
                             currentMediaElement.id = currentMedia[ 'name' ];
                             break;
@@ -174,9 +168,6 @@ export default class GLTFMPEGMediaExtension {
                                     source.setAttribute( 'src', parser.options.path + mediaAlternative.uri );
                                     source.setAttribute( 'type', mimeCodecString );
                                     currentMediaElement.appendChild( source ); // add to html video element
-
-                                    // console.log( currentMediaElement );
-
                                 }
                                 else {
                                     console.warn( 'MPEG_media.media.alternative: unsupported codec');
@@ -186,8 +177,6 @@ export default class GLTFMPEGMediaExtension {
                     } // end switch
                 }
             }
-            // add HTML video element to array of MPEG media in the returned object
-            gltf.userData.gltfExtensions[ 'MPEG_media' ].push( currentMediaElement );
 
             // add HTML element to document body
             document.body.appendChild( currentMediaElement );

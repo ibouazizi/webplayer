@@ -12,18 +12,18 @@ import {
   } from 'three';
 
 const WEBGL_FILTERS = {
-    9728: NearestFilter,
-    9729: LinearFilter,
-    9984: NearestMipmapNearestFilter,
-    9985: LinearMipmapNearestFilter,
-    9986: NearestMipmapLinearFilter,
-    9987: LinearMipmapLinearFilter
+    1003: NearestFilter,
+    1006: LinearFilter,
+    1004: NearestMipmapNearestFilter,
+    1007: LinearMipmapNearestFilter,
+    1005: NearestMipmapLinearFilter,
+    1008: LinearMipmapLinearFilter
   };
   
   const WEBGL_WRAPPINGS = {
-    33071: ClampToEdgeWrapping,
-    33648: MirroredRepeatWrapping,
-    10497: RepeatWrapping
+    1001: ClampToEdgeWrapping,
+    1002: MirroredRepeatWrapping,
+    1000: RepeatWrapping
   };
 
 /**
@@ -45,7 +45,7 @@ export default class GLTFMPEGTextureVideoExtension {
     loadTexture( textureIndex ) {
 
         const parser = this.parser;
-		    const json = parser.json;
+		const json = parser.json;
 
         const textureDef = json.textures[ textureIndex ];
 
@@ -53,9 +53,8 @@ export default class GLTFMPEGTextureVideoExtension {
 			    return null;
 		    }
 
+        // TODO: validation that these are present
         const extensionDef = textureDef.extensions[ this.name ];
-        //console.log( extensionDef );
-        
         const accessorIndex = extensionDef.accessor;
         const accessor = json.accessors[ accessorIndex ];
         const bufferViewIndex = accessor.bufferView;
@@ -63,15 +62,27 @@ export default class GLTFMPEGTextureVideoExtension {
         const bufferIndex = bufferView.buffer;
         const buffer = json.buffers[ bufferIndex ];
 
-        console.log( buffer.extensions.MPEG_buffer_circular.media );
+        const mediaAccessString = 'MPEG_media_' + buffer.extensions.MPEG_buffer_circular.media;
+        const video = document.getElementById( mediaAccessString );
 
-        // DEBUGGING - creating video element here instead
-        const video = document.createElement( 'video' );
+        // sampler def for this texture
+        const samplersDef = json.samplers || [];
+        const samplerDef = samplersDef[textureDef.sampler] || {};
 
         return new Promise( resolve => {
-            video.src = './gltf/livingRoomEXT/video/bbb_360p_48k.mp4';
-            video.play();
+
+            // TODO: play if not already playing?
+            if( video.autoplay == false ) {
+                console.log( "no autoplay" );
+                video.play();
+            }
+
             const texture = new VideoTexture( video );
+            // set properties with sampler properties
+            texture.magFilter = WEBGL_FILTERS[ samplerDef.magFilter ] || LinearFilter;
+            texture.minFilter = WEBGL_FILTERS[ samplerDef.minFilter ] || LinearFilter;
+            texture.wrapS = WEBGL_WRAPPINGS[ samplerDef.wrapS ] || RepeatWrapping;
+            texture.wrapT = WEBGL_WRAPPINGS[ samplerDef.wrapT ] || RepeatWrapping;
             texture.flipY = false;
             resolve( texture );
         });
