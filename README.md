@@ -4,10 +4,10 @@ inealey@ucsd.edu
 
 progress towards implementation and demo software for MPEG-I SD support in THREE.js.
 
-'main' branch for latest changes.
-'template' branch for full project template.
-'simple' branch for stripped-down template
-'HTMLMediaElement' branch for implementation that uses HTMLMediaElement API for audio/video playback.
+- 'main' branch for latest changes.
+- 'template' branch for full project template.
+- 'simple' branch for stripped-down template
+- 'HTMLMediaElement' branch for implementation that uses HTMLMediaElement API for audio/video playback.
 
 ### Demo:
 
