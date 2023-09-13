@@ -6,7 +6,7 @@ import Stats from 'three/addons/libs/stats.module.js';
 import { degToRad } from 'three/src/math/MathUtils';
 import { RingBuffer } from "./third_party/ringbufjs/ringbuf.module.js";
 
-const ENABLE_DEBUG_LOGGING = true;
+const ENABLE_DEBUG_LOGGING = false;
 
 function debugLog(msg) {
   if (!ENABLE_DEBUG_LOGGING)
