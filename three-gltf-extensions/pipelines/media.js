@@ -11,7 +11,7 @@
  *  and we must use `importScripts` or dynamic module imports.
  */
 
-importScripts( '../constants.js' );
+importScripts( './constants.js' );
 importScripts( '../third_party/ringbufjs/ringbuf.js' );
  
  /**

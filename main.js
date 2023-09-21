@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
-import { GLTFLoader } from './GLTFLoader.js'; // <-- note this modified from the THREE loader
+import { GLTFLoader } from './three-gltf-extensions/GLTFLoader.js'; // <-- note this modified from the THREE loader
 import Stats from 'three/addons/libs/stats.module.js';
 
 //  extension imports

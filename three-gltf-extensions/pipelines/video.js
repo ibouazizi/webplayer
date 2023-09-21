@@ -12,7 +12,7 @@ function debugLog(msg) {
     console.debug(msg);
 }
 
-importScripts('../node_modules/mp4box/dist/mp4box.all.min.js');
+importScripts('../../node_modules/mp4box/dist/mp4box.all.min.js');
 importScripts('../third_party/opencv/4.8.0/opencv.js');
 importScripts('./format_converter.js');
 importScripts('./media.js');

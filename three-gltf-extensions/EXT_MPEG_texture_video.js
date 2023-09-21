@@ -1,4 +1,4 @@
-import { RingBuffer } from "../third_party/ringbufjs/ringbuf.module.js";
+import { RingBuffer } from "./third_party/ringbufjs/ringbuf.module.js";
 import {
     ClampToEdgeWrapping,
     LinearFilter,
@@ -110,7 +110,7 @@ export class GLTFMPEGTextureVideoExtension {
 
                 // allocate WebWorker and start pipeline
                 // attach worker to texture so messages may be sent in the future (i.e. seeking)
-                texture.worker = new Worker( '../pipelines/video.js' );
+                texture.worker = new Worker( './three-gltf-extensions/pipelines/video.js' );
 
                 // retrieve index of the MPEG_media we want to fetch
                 let bufferIdx = json.bufferViews[ accessor.properties.bufferView ].buffer;
@@ -121,7 +121,7 @@ export class GLTFMPEGTextureVideoExtension {
                 let mediaDef =  parser.plugins.MPEG_media.metadata.media[ mediaIdx ].alternatives[0];
 
                 // path template for use with MPEG_media uri
-                let mediaPath = '../' + parser.options.path;
+                let mediaPath = '../../' + parser.options.path;
 
                 // send initialization meessage to worker. this is the
                 // only message passing to be done between the threads
