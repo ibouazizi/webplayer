@@ -66,7 +66,8 @@ async function init() {
   // load an environment map from file
   const envLoader = new RGBELoader();
   envLoader.setPath( 'images/envmaps/' );
-  const background = await envLoader.loadAsync( 'royal_esplanade_1k.hdr' );
+  // const background = await envLoader.loadAsync( 'royal_esplanade_1k.hdr' );
+  const background = await envLoader.loadAsync( 'brown_photostudio_4k.hdr' );
   background.mapping = THREE.EquirectangularReflectionMapping;
   scene.background = background;
   scene.environment = background;
@@ -90,6 +91,9 @@ async function init() {
   // add glTF to THREE scene
   scene.add( glTFData.scene );
 
+  // recursively set world matrices ( needed for spatial audio )
+  scene.updateMatrixWorld();
+
   // if glTF provided a camera(s), use it for rendering and controls
   // TODO: some way to cycle through if there are > 1
   if( glTFData.cameras.length > 0 ) {
@@ -97,10 +101,16 @@ async function init() {
     camera.parent = null;        // break camera out of glTF node graph
     controls.object = camera;    // use current controller for this camera
     onWindowResize();
+
+    // move camera ( this really should be modified in gltf instead)
+    camera.position.set( 1.66, 1.2, 0.2 );
   }
 
-  // recursively set world matrices ( needed for spatial audio )
-  scene.updateMatrixWorld();
+  // point camera at TV
+  const tvMesh = scene.getObjectByName( 'TV_screen' );
+  const tvBBox = new THREE.Box3();
+  tvBBox.setFromObject( tvMesh );
+  controls.target = tvBBox.getCenter( new THREE.Vector3() );
 
   // retrieve media pointers and add to update list
   updatableMedia.push(...glTFData.userData.MPEG_media.updatables );

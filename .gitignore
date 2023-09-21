@@ -2,5 +2,5 @@ node_modules
 package-lock.json
 gltf
 
-!gltf/livingRoomEXT/*
+!gltf/test_scene/*
 !gltf/tv_model/*
