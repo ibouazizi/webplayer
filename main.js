@@ -100,13 +100,12 @@ async function init() {
     camera = glTFData.cameras[0];
     camera.parent = null;        // break camera out of glTF node graph
     controls.object = camera;    // use current controller for this camera
-    onWindowResize();
-
-    // move camera ( this really should be modified in gltf instead)
-    camera.position.set( 1.66, 1.2, 0.2 );
+    onWindowResize();    
   }
 
+  // move camera ( this stuff should be changed in gltf instead )
   // point camera at TV
+  camera.position.set( 1.66, 1.2, 0.2 );
   const tvMesh = scene.getObjectByName( 'TV_screen' );
   const tvBBox = new THREE.Box3();
   tvBBox.setFromObject( tvMesh );
