@@ -20,7 +20,7 @@ export class GLTFMPEGMediaExtension {
         this.parser = parser;
 
         if( !parser.json.extensions ) {
-            console.warn( "no extensions not found in file." );
+            console.warn( "no extensions found in file." );
             return;
         }
         
