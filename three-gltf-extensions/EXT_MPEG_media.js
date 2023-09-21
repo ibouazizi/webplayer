@@ -18,9 +18,15 @@ export class GLTFMPEGMediaExtension {
     constructor( parser ) {
         this.name = 'MPEG_media';
         this.parser = parser;
+
+        if( !parser.json.extensions ) {
+            console.warn( "no extensions not found in file." );
+            return;
+        }
         
         if( !this.parser.json.extensions.MPEG_media ) {
             console.warn( "MPEG_media not found in file." );
+            return;
         }
         
         this.metadata = this.parser.json.extensions.MPEG_media;
