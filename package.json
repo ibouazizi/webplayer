@@ -2,7 +2,7 @@
   "devDependencies": {
     "es-module-shims": "^1.8.0",
     "mp4box": "^0.5.2",
-    "three": "^0.154.0",
+    "three": "^0.156.1",
     "vite": "^4.4.9"
   }
 }

@@ -1,16 +1,10 @@
 /**
- *  Each MediaPipeline variant should be ran in its own webworker 
- *  to seperate the work for each pipeline.
- * 
- *  For this reason, we will not use a "driver" script to house the 
- *  demuxing / decoding classes and each pipeline will need to handle
- *  any communication with the main thread
- * 
- *  as mentioned in the webcodecs samples, mp4box.js does not use ES6 modules,
- *  and as such we must use `importScripts` or dynamic module imports.
+ * WebWorker script for MPEG_texture_video
  */
 
 const ENABLE_DEBUG_LOGGING = false;
+
+const FPS = 1000 / 6;  // check buffer health at the given interval
 
 function debugLog(msg) {
     if (!ENABLE_DEBUG_LOGGING)
@@ -23,39 +17,73 @@ importScripts('../third_party/opencv/4.8.0/opencv.js');
 importScripts('./format_converter.js');
 importScripts('./media.js');
 
+
+// listen for an initialization message from main
+self.addEventListener( "message", async function( msg ) {
+    switch( msg.data.command ) {
+        case 'initialize':
+            // allocate a new video pipeline
+            let pipeline = new MP4VideoPipeline(
+                msg.data.uri,
+                msg.data.track,
+                msg.data.type,
+                msg.data.componentType,
+                msg.data.width,
+                msg.data.height,
+                msg.data.options
+            );
+
+            // initialize pipeline
+            await pipeline.initialize( msg.data.sab );
+
+            break;
+
+        default:
+            console.warn( "unexpected message from main thread" );
+            break;
+    }
+}, {once: true} );
+
+
 /**
  *  Pipeline class to prepare video frames from an MPEG_media
  *  source for rendering ( audio handled seperately )
  */   
 class MP4VideoPipeline extends MediaPipeline {
 
-    constructor( uri, bufferCapacity, type, componentType, track, width, height, format, options ) {
-        super( 'video/mp4', uri, bufferCapacity, type, componentType, options );
+    constructor( uri, track, type, componentType, width, height, format, options ) {
+        super( 'video/mp4', uri, type, componentType, options );
         this.track = track; // TODO: implement which video track to use
 
         // video frame dimensions
         // should match VideoFrame.displayHeight and VideoFrame.displayWidth
-        // TODO: support resizing?
+        // MAYBE: support resizing?
         this.height = height;
         this.width = width;
         this.format = format; // output pixel format for MPEG_texture_video
-
-        // buffer size (in video frames)
-        this.maxBufferFrames = bufferCapacity / 
-            ( height * width * 
-                GL_COMPONENT_TYPES[this.componentType].BYTES_PER_ELEMENT *
-                GL_TYPE_SIZES[this.type] );
-
-        console.assert( this.maxBufferFrames >= 2 );
+        this.maxBufferFrames = null;
     }
 
     // set the pipeline up for demuxing and decoding frames
-    async initialize() {
+    async initialize( sab ) {
+
+        // initialize RingBuffer
+        super.initialize( sab );
+
+        // get buffer size (in video frames)
+        this.maxBufferFrames = ( this.buffer.capacity() ) / 
+            ( this.height * this.width * 
+                GL_COMPONENT_TYPES[this.componentType].BYTES_PER_ELEMENT *
+                GL_TYPE_SIZES[this.type] );
+
+        // spec declares buffer must hold >= 2 frames
+        console.assert( this.maxBufferFrames >= 2 );
+
         // dynamic import demuxer
         let demuxerModule = await import( './demuxer/mp4_pull_demuxer.js' );
         // attach to pipeline
         this.demuxer = new demuxerModule.MP4PullDemuxer( this.uri );
-        await this.demuxer.initialize( VIDEO_STREAM_TYPE ); // silent error here if bad path!!
+        await this.demuxer.initialize( VIDEO_STREAM_TYPE ); // ! silent error here if bad uri !
         const config = this.demuxer.getDecoderConfig();
         
         // attach a VideoDecoder to this pipeline
@@ -65,9 +93,11 @@ class MP4VideoPipeline extends MediaPipeline {
         });
 
         // check for codec support
+        // TODO: this should check MPEG_media properties..
         let support = await VideoDecoder.isConfigSupported( config );
         console.assert( support.supported );
-        
+
+        // confiure decoder
         this.decoder.configure( config );
 
         debugLog( config );
@@ -76,12 +106,14 @@ class MP4VideoPipeline extends MediaPipeline {
         // TODO: determine Mat size based on pixel format
         //      need height and width format dependent
         //      need  OpenCV type constant, # channels dependent
+        // see format_converter.js
 
         this.inputMat = new cv.Mat( this.height * 1.5, this.width, cv.CV_8UC1 );
         this.outputMat = new cv.Mat( this.height, this.width, cv.CV_8UC3 );
 
         // start to fill the buffer
-        this.fillFrameBuffer();
+        // MAYBE: adapt to display rate
+        setInterval( this.fillFrameBuffer.bind( this ), FPS );
     }
 
     async fillFrameBuffer() {
@@ -105,67 +137,30 @@ class MP4VideoPipeline extends MediaPipeline {
 
         this.fillInProgress = false;
 
-        // Give decoder a chance to work, see if we saturated the pipeline.
-        setTimeout(this.fillFrameBuffer.bind( this), 0);
+        // give decoder a cance to work
+        // setTimeout( this.fillFrameBuffer.bind(this), 0 );
         return;
     }
 
     // bound to the VideoDecoder.
     // process an individual frame and push into the buffer
-    // TODO: implement timing logic here
+    // MAYBE: implement timing logic here?
     async bufferFrame( frame ) {
         debugLog(`bufferFrame(${frame.timestamp})`);
 
         await frame.copyTo( this.inputMat.data );
 
-        frame.close();
-
         // TODO: set color codes based on accessor !!
         await cv.cvtColor( this.inputMat, this.outputMat, cv.COLOR_YUV2RGB_NV12 );
+
+        // i.e. RGBA would use:
         // await cv.cvtColor( this.inputMat, this.outputMat, cv.COLOR_YUV2RGBA_NV12 );
 
-        this.buffer.push( this.outputMat.data );
+        // push converted frame to circular buffer
+        await this.buffer.push( this.outputMat.data );
+
+        frame.close();
       }
 
     // implement more video specific functions here as needed ..
 }
-
-// initialize a media pipeline for video
-// let pipeline = new MP4VideoPipeline( "video/mp4", "../videos/bbb_360p_48k.mp4", 2073600, "VEC3", 5121, 0, 640, 360, {} );
-
-// using RGBA to see if texture upload works - 3 frames of RGBA
-// let pipeline = new MP4VideoPipeline( "video/mp4", "../videos/bbb_360p_48k.mp4", 2764800, "VEC4", 5121, 0, 640, 360, {} );
-
-// 10 frames of RGBA    
-// let pipeline = new MP4VideoPipeline( "video/mp4", "../videos/bbb_360p_48k.mp4", 9216000, "VEC4", 5121, 0, 640, 360, {} );
-
-// // 3 frames of RGBA @ 1280 x 720
-// let pipeline = new MP4VideoPipeline( "video/mp4", "https://w3c.github.io/webcodecs/samples/data/bbb_video_avc_frag.mp4",
-// 11059200, "VEC4", 5121, 0, 1280, 720, {} );
-
-// // 10 frames of RGBA @ 1280 x 720s
-// let pipeline = new MP4VideoPipeline( "video/mp4", "https://w3c.github.io/webcodecs/samples/data/bbb_video_avc_frag.mp4",
-// 36864000, "VEC4", 5121, 0, 1280, 720, {} );
-
-// 10 frames of RGB @ 1280 x 720s
-let pipeline = new MP4VideoPipeline( "https://w3c.github.io/webcodecs/samples/data/bbb_video_avc_frag.mp4",
-27648000, "VEC3", 5121, 0, 1280, 720, {} );
-
-
-// listen for messages from the main threads
-self.addEventListener( "message", async function( msg ) {
-    switch( msg.data.command ) {
-        case 'initialize':
-            await pipeline.initialize();
-            self.postMessage({
-                command:  "initialization-done",
-                sab: pipeline.buffer.buf
-            });
-            break;
-
-        case 'fill-buffer':
-            await pipeline.fillFrameBuffer();
-            break;
-    }
-
-});
