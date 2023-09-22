@@ -12,9 +12,6 @@
  *  although it may be prudent in the future to support any componentType for output pixel samples,
  *  i.e. for DEPTH_COMPONENT
  * 
- *  This could enable support for hdr textures and 3d-coded video media like v-pcc
- * 
- * 
  *  height, width are the image dimensions in pixels
  *  inputFormat may be one of: 'I420', 'I420A', 'I422', 'I444', 'NV12', 'RGBA', 'RGBX', 'BGRA', 'BGRX'
  *  outputFormat may be one of: 'RED', 'GREEN', 'BLUE', 'RG', 'RGB', 'RGBA', 'BGR', 'BGRA', 'DEPTH_COMPONENT'
