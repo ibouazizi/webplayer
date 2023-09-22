@@ -57,3 +57,24 @@ http://localhost:5173
 * `main.css`: cascading style sheet for our page. contains 'start button' config
 * `main.js`: this demo's main driver script. demonstrates the setup and animation of a scene with THREE.js with glTF content, lights, and controls. registers glTF extensions and loads a model from file
 * `vite.config.js`: CORS header settings for Vite JS. needed for SharedArrayBuffer support
+
+### Notes from the dev:
+
+* the code is heavily commented to encourage readbility and further development
+* comments items marked `TODO` I consider to be places where the implemention is incomplete and needs more work before formal presentation of this software
+* comments marked `MAYBE` are just ideas I had during development, such as the optimal places to perform certain tasks
+
+#### Major TODO items:
+* THREE.js
+  * PR with support for parsing buffer and accessor extensions in glTF. see GLTFLoader. 
+  * implement logic for a 'media' dependency type when parsing glTF. this will make the cascading dependencies more obvious while parsing, and can then adjust `EXT_MPEG_media.js` accrdingly
+  
+* Media Pipeline:
+  * support for playback controls, i.e. pause play seek
+  * select proper tracks for playback
+  * check media alternatives to see if content playback is supported
+  
+* Video Pipeline:
+  
+* Support for spatial audio
+  *  `mp4_pull_demuxer.js` is prepared to demux audio tracks. need to implement THREE.js glTF extension to read the buffer and pass audio frames to WebAudio
