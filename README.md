@@ -1,80 +1,146 @@
-# THREE.JS MPEG-I SD extensions
+# WebPlayer
 
-This project is an initial push to support MPEG-I SD extensions in THREE.js.
-Isaac Nealey 2023 - contact: inealey@ucsd.edu 
-- 'main' branch for latest changes and simple demo
-- 'HTMLMediaElement' branch for implementation that uses HTMLMediaElement API for audio/video playback.
-- 'develop' branch for experiments and proposed changes
+Three.js MPEG extensions for glTF with DASH streaming support. This project enables streaming video textures in glTF models using DASH.
 
-## Run Demo:
+## Features
 
-#### 1. Install Node.js / npm
-```
-https://nodejs.org/en/download
-```
+- MPEG-DASH streaming support for video textures
+- glTF extensions for video and audio streaming
+- Real-time video texture updates
+- VR/XR support
+- Debug visualization tools
+- Spatial audio support
 
-#### 2. clone this repository
-```
-git clone https://github.com/inealey/threejs-mpeg-extensions.git
-cd threejs-mpeg-extentions
-```
+## Installation
 
-#### 3. install dependencies
-```
+```bash
+# Install dependencies
 npm install
+
+# Start development server
+npm run dev
+
+# Build for production
+npm run build:prod
 ```
 
-#### 4. start HTTP server
+## Project Structure
+
 ```
-npx vite
+webplayer/
+├── src/                    # Source files
+│   ├── css/               # Stylesheets
+│   └── js/                # JavaScript files
+│       ├── main.js        # Entry point
+│       └── three-gltf-extensions/  # glTF extensions
+│           ├── EXT_MPEG_media.js           # Media pipeline management
+│           ├── EXT_MPEG_buffer_circular.js # Circular buffer for streaming
+│           ├── EXT_MPEG_texture_video.js   # Video texture handling
+│           └── EXT_MPEG_audio_spatial.js   # Spatial audio support
+├── public/                 # Static assets
+│   ├── images/            # Image assets
+│   └── gltf/              # glTF models and textures
+├── dist/                   # Build output
+└── node_modules/          # Dependencies
+
 ```
 
-#### 5. click on the generated link to visit browser
+## glTF Extensions
+
+### MPEG_media
+Handles media streaming setup and pipeline management. Supports:
+- DASH streaming configuration
+- Media pipeline creation
+- Stream synchronization
+
+### MPEG_buffer_circular
+Manages circular buffers for efficient streaming:
+- Lock-free buffer implementation
+- Shared memory for worker communication
+- Automatic buffer size management
+
+### MPEG_texture_video
+Handles video textures in glTF models:
+- Real-time texture updates
+- Frame synchronization
+- Debug visualization
+- Memory-efficient frame handling
+
+### MPEG_audio_spatial
+Provides spatial audio support:
+- 3D audio positioning
+- Distance-based attenuation
+- Audio source management
+
+## Development
+
+### Environment Setup
+
+The project includes two environment configurations:
+
+1. Development (.env.development):
+```env
+NODE_ENV=development
+VITE_DROP_CONSOLE=false
+VITE_SOURCEMAP=true
+VITE_PORT=3000
 ```
-http://localhost:5173
+
+2. Production (.env.production):
+```env
+NODE_ENV=production
+VITE_DROP_CONSOLE=true
+VITE_SOURCEMAP=false
+VITE_COMPRESSION=true
 ```
 
-## Project Overview:
+### Available Scripts
 
-* **three-gltf-extensions**  
-  * **pipelines**  
-    * **demuxer**
-      * `mp4_pull_demuxer.js`:  pull-based demuxing of mp4 files. mp4box.js and WebCodecs. supports audio and video tracks
-      * `mp4_demuxer_base`: base class to be extended by demuxer implementations
-    * `constants.js`: dictionaries for type conversion
-    * `format_converter.js`: function for handling color space conversion with OpenCV
-    * `media.js`: base MediaPipeline class to be extended by concrete MPEG_media pipeline implementations
-    * `video.js`: class for processing video frames for MPEG_texture_video. to be executed in WebWorker
-  * **third_party**
-    * `opencv/4.8.0/opencv.js`: OpenCV.js version 4.8.0
-    * `ringbuf/ringbuf.js`: thread-safe ring buffer: https://github.com/padenot/ringbuf.js/
-  * `EXT_MPEG_accessor_timed.js`: support for the MPEG_accessor_timed extension. to be loaded by glTF parser
-  * `EXT_MPEG_buffer_circular.js`: support for the MPEG_buffer_circular extension. to be loaded by glTF parser
-  * `EXT_MPEG_media.js`: support for the MPEG_media extension. to be loaded by glTF parser
-  * `EXT_MPEG_texture_video.js`: support for the MPEG_texture_video extension. to be loaded by glTF parser  
-  * `GLTFLoader.js`: glTFLoader class for parsing glTF files. use this one until changes can be merged with THREE  
-* `index.html`: simple HTML web page to display THREE.js canvas
-* `main.css`: cascading style sheet for our page. contains 'start button' config
-* `main.js`: this demo's main driver script. demonstrates the setup and animation of a scene with THREE.js with glTF content, lights, and controls. registers glTF extensions and loads a model from file
-* `vite.config.js`: CORS header settings for Vite JS. needed for SharedArrayBuffer support
+- `npm run dev`: Start development server
+- `npm run build`: Build for development
+- `npm run build:prod`: Build for production with optimizations
+- `npm run preview`: Preview production build
+- `npm run clean`: Clean build output
 
-### Notes from the dev:
+### Build Features
 
-* the code is heavily commented to encourage readbility and further development
-* comments items marked `TODO` I consider to be places where the implemention is incomplete and needs more work before formal presentation of this software
-* comments marked `MAYBE` are just ideas I had during development, such as the optimal places to perform certain tasks
+- Code splitting and chunking
+- Production optimizations:
+  - Minification
+  - Tree shaking
+  - Compression (gzip, brotli)
+- Legacy browser support
+- Source maps
+- Environment-specific configurations
 
-#### Major TODO items:
-* THREE.js
-  * PR with support for parsing buffer and accessor extensions in glTF. see GLTFLoader. 
-  * implement logic for a 'media' dependency type when parsing glTF. this will make the cascading dependencies more obvious while parsing, and can then adjust `EXT_MPEG_media.js` accrdingly
-  
-* Media Pipeline:
-  * support for playback controls, i.e. pause play seek
-  * select proper tracks for playback
-  * check media alternatives to see if content playback is supported
-  
-* Video Pipeline:
-  
-* Support for spatial audio
-  *  `mp4_pull_demuxer.js` is prepared to demux audio tracks. need to implement THREE.js glTF extension to read the buffer and pass audio frames to WebAudio
+## Recent Updates
+
+### Video Texture Improvements
+- Fixed buffer handling in worker and main thread
+- Added chunked data transfer to prevent memory issues
+- Improved texture update synchronization
+- Added proper error handling
+- Enhanced debug texture visualization
+
+### Asset Management
+- Added TV model with video texture support
+- Added test scene with environment textures
+- Configured Git LFS for large file handling
+- Organized assets in public directory
+
+### Build System
+- Updated package.json with new scripts and dependencies
+- Added Vite configuration with production optimizations
+- Created environment-specific configurations
+- Improved build artifact management
+
+## Browser Support
+
+- Modern browsers (Chrome, Firefox, Safari, Edge)
+- Legacy browser support via @vitejs/plugin-legacy
+- WebGL 2.0 support required
+- SharedArrayBuffer support required
+
+## License
+
+MIT
