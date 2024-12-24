@@ -1,8 +1,53 @@
 {
+  "name": "threejs-mpeg-extensions",
+  "version": "1.0.0",
+  "description": "Three.js MPEG extensions for glTF with DASH streaming support",
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/openhands/threejs-mpeg-extensions"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "serve": "vite preview",
+    "clean": "rm -rf dist/",
+    "build:prod": "npm run clean && vite build --mode production"
+  },
+  "dependencies": {
+    "dashjs": "4.7.2",
+    "three": "0.160.0"
+  },
   "devDependencies": {
+    "@types/node": "^20.10.6",
+    "@vitejs/plugin-legacy": "^5.2.0",
     "es-module-shims": "^1.8.0",
+    "less": "^4.2.0",
+    "lightningcss": "^1.22.1",
     "mp4box": "^0.5.2",
-    "three": "^0.156.1",
-    "vite": "^4.4.9"
+    "sass": "^1.69.7",
+    "sass-embedded": "^1.69.7",
+    "stylus": "^0.62.0",
+    "sugarss": "^4.0.1",
+    "terser": "^5.26.0",
+    "vite": "^5.0.10",
+    "vite-plugin-compression": "^0.5.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
