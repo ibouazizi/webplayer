@@ -6,7 +6,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/openhands/threejs-mpeg-extensions"
+    "url": "https://github.com/ibouazizi/webplayer"
   },
   "scripts": {
     "dev": "vite",
