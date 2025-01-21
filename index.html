@@ -1,27 +1,95 @@
-<html>
-    <head>
-        <title>THREE.JS MPEG-I SD DEMO</title>
-        <link rel="icon" type="image/x-icon" href="./images/icons/favicon.ico">
-        <link rel="stylesheet" href="main.css">
-    </head>
-    <body>
-        <div id='start-screen' class='screen' style='display:block'>
-            <button> Load Scene </button>
-        </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cross-Origin-Embedder-Policy" content="require-corp">
+    <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin">
+    <meta http-equiv="Cross-Origin-Resource-Policy" content="cross-origin">
+    
+    <title>THREE.JS MPEG-I SD DEMO</title>
+    <link rel="icon" type="image/x-icon" href="/images/icons/favicon.ico">
+    <link rel="stylesheet" href="/src/css/main.css">
 
-        <!--Import maps polyfill
-		Remove this when import maps will be widely supported -->
-		<script async src="./node_modules/es-module-shims/dist/es-module-shims.js"></script>
-		<script type="importmap">
-			{
-				"imports": {
-					"three": "./node_modules/three.js/build/three.module.js",
-					"three/addons/": "./node_modules/three.js/examples/jsm/"
+    <!-- Initialize OpenCV.js -->
+    <script>
+        // Create a promise that resolves when OpenCV is ready
+        window.opencvReady = new Promise((resolve) => {
+            window.onOpenCvReady = () => {
+                console.log('OpenCV.js is ready');
+                resolve();
+            };
+        });
+
+        // Initialize Module for OpenCV.js
+        var Module = {
+            wasmBinaryFile: '/js/opencv_js.wasm',
+            onRuntimeInitialized: function() {
+                console.log('OpenCV.js runtime initialized');
+                if (window.onOpenCvReady) {
+                    window.onOpenCvReady();
                 }
-			}
-		</script>
+            },
+            print: function(text) {
+                console.log('OpenCV.js:', text);
+            },
+            printErr: function(text) {
+                console.error('OpenCV.js error:', text);
+            }
+        };
+        window.Module = Module;
+    </script>
+    
+    <!-- Load OpenCV.js -->
+    <script src="/js/opencv.js"></script>
+</head>
+<body>
+    <script>
+        console.log('Page starting to load...');
+        
+        // Global error handler
+        window.onerror = function(msg, url, lineNo, columnNo, error) {
+            console.error('Global error:', {
+                message: msg,
+                url: url,
+                lineNo: lineNo,
+                columnNo: columnNo,
+                error: error
+            });
+            return false;
+        };
 
-        <script type="module" src="./main.js"></script>
+        // Handle unhandled promise rejections
+        window.addEventListener('unhandledrejection', function(event) {
+            console.error('Unhandled promise rejection:', event.reason);
+        });
 
-    </body>
+        // Create a promise that resolves when OpenCV is ready
+        window.opencvReady = new Promise((resolve) => {
+            window.onOpenCvReady = () => {
+                console.log('OpenCV.js is ready');
+                resolve();
+            };
+        });
+
+        // Initialize Module for OpenCV.js
+        window.Module = {
+            onRuntimeInitialized: function() {
+                console.log('OpenCV.js runtime initialized');
+                if (window.onOpenCvReady) {
+                    window.onOpenCvReady();
+                }
+            },
+            print: function(text) {
+                console.log('OpenCV.js:', text);
+            },
+            printErr: function(text) {
+                console.error('OpenCV.js error:', text);
+            }
+        };
+    </script>
+
+    <!-- Main application script -->
+    <script type="module" src="/src/js/main.js"></script>
+</body>
 </html>
