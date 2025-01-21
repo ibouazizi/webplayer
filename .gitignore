@@ -1,7 +1,5 @@
 node_modules
 package-lock.json
-gltf
 dist
-
-!gltf/theater/*
-!gltf/tv_model/*
+dev.log
+.DS_Store
