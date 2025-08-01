@@ -1,0 +1,13 @@
+{
+  "name": "swap-webrtc-sender",
+  "version": "1.0.0",
+  "description": "WebRTC sender application for MPEG Scene Description",
+  "type": "module",
+  "scripts": {
+    "start": "npx serve . -p 8080 --cors",
+    "dev": "npx serve . -p 8080 --cors"
+  },
+  "devDependencies": {
+    "serve": "^14.2.0"
+  }
+}

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SWAP WebRTC Sender</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            margin-top: 0;
+            color: #333;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+        
+        .video-container {
+            margin: 20px 0;
+            background: #000;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        video {
+            width: 100%;
+            display: block;
+        }
+        
+        .status {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            text-align: center;
+        }
+        
+        .status.disconnected {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status.connecting {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .status.connected {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .stat-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        #startButton {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        #startButton:hover:not(:disabled) {
+            background-color: #218838;
+        }
+        
+        #stopButton {
+            background-color: #dc3545;
+            color: white;
+        }
+        
+        #stopButton:hover:not(:disabled) {
+            background-color: #c82333;
+        }
+        
+        .help-text {
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SWAP WebRTC Sender Application</h1>
+        
+        <div class="status disconnected" id="status">Disconnected</div>
+        
+        <div class="stats-container">
+            <div class="stat-box">
+                <div class="stat-value" id="viewerCount">0</div>
+                <div class="stat-label">Viewers</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value"><span id="bitrate">0</span> kbps</div>
+                <div class="stat-label">Bitrate</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value"><span id="fps">0</span> fps</div>
+                <div class="stat-label">Frame Rate</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value"><span id="latency">0</span> ms</div>
+                <div class="stat-label">Latency</div>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="serverUrl">SWAP Server URL</label>
+            <input type="text" id="serverUrl" value="wss://bouazizi.dev:8443" />
+            <div class="help-text">WebSocket Secure URL of the SWAP server</div>
+        </div>
+        
+        <div class="form-group">
+            <label for="wsEndpoint">WebSocket Endpoint (optional)</label>
+            <input type="text" id="wsEndpoint" placeholder="/3gpp-swap/v1/" />
+            <div class="help-text">Leave empty to use default 3GPP endpoint</div>
+        </div>
+        
+        <div class="form-group">
+            <label for="criteria">Connection Criteria</label>
+            <input type="text" id="criteria" value="siggraph2025" />
+            <div class="help-text">Text string to match senders and receivers</div>
+        </div>
+        
+        <div class="form-group">
+            <label for="videoSource">Video Source</label>
+            <select id="videoSource">
+                <option value="">Loading devices...</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="audioSource">Audio Source</label>
+            <select id="audioSource">
+                <option value="">Loading devices...</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="resolution">Resolution</label>
+            <select id="resolution">
+                <option value="1920x1080">1920x1080 (Full HD)</option>
+                <option value="1280x720" selected>1280x720 (HD)</option>
+                <option value="640x480">640x480 (SD)</option>
+                <option value="320x240">320x240 (Low)</option>
+            </select>
+        </div>
+        
+        <div class="video-container">
+            <video id="localVideo" autoplay muted></video>
+        </div>
+        
+        <div class="action-buttons">
+            <button id="startButton">Start Streaming</button>
+            <button id="stopButton" disabled>Stop Streaming</button>
+        </div>
+        
+    </div>
+    
+    <script type="module" src="sender.js"></script>
+</body>
+</html>
