@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cross-Origin-Embedder-Policy" content="require-corp">
+    <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin">
+    <meta http-equiv="Cross-Origin-Resource-Policy" content="cross-origin">
+    
+    <title>THREE.JS MPEG-I SD DEMO</title>
+    <link rel="icon" type="image/x-icon" href="/images/icons/favicon.ico">
+    <link rel="stylesheet" href="/src/css/main.css">
+
+    <!-- Initialize OpenCV.js -->
+    <script>
+        // Define Module globally before anything else
+        var Module = {
+            wasmBinaryFile: '/js/opencv_js.wasm',
+            onRuntimeInitialized: function() {
+                console.log('OpenCV.js runtime initialized');
+                if (window.onOpenCvReady) {
+                    window.onOpenCvReady();
+                }
+            },
+            print: function(text) {
+                console.log('OpenCV.js:', text);
+            },
+            printErr: function(text) {
+                console.error('OpenCV.js error:', text);
+            }
+        };
+        
+        // Make sure it's global
+        window.Module = Module;
+        
+        // Create a promise that resolves when OpenCV is ready
+        window.opencvReady = new Promise((resolve) => {
+            window.onOpenCvReady = () => {
+                console.log('OpenCV.js is ready');
+                resolve();
+            };
+        });
+    </script>
+    
+    <!-- Load OpenCV.js -->
+    <script src="/js/opencv.js"></script>
+</head>
+<body>
+    <!-- Scene selector UI -->
+    <div id="scene-selector" style="position: absolute; top: 10px; left: 10px; z-index: 1000; background: rgba(0,0,0,0.7); padding: 10px; border-radius: 5px;">
+        <label style="color: white; font-family: Arial, sans-serif;">
+            Select Scene:
+            <select id="scene-select" style="margin-left: 10px; padding: 5px;">
+                <option value="dash">DASH Streaming (Theater)</option>
+                <option value="webrtc">WebRTC Live (SWAP)</option>
+            </select>
+        </label>
+        <button onclick="loadSelectedScene()" style="margin-left: 10px; padding: 5px 10px;">Load</button>
+    </div>
+    
+    <script>
+        // Scene selector logic
+        function loadSelectedScene() {
+            const select = document.getElementById('scene-select');
+            const scene = select.value;
+            window.location.href = `?scene=${scene}`;
+        }
+        
+        // Set current scene in dropdown
+        const urlParams = new URLSearchParams(window.location.search);
+        const currentScene = urlParams.get('scene') || 'dash';
+        document.getElementById('scene-select').value = currentScene;
+    </script>
+
+    <!-- Main application script -->
+    <script type="module" src="/src/js/main.js"></script>
+</body>
+</html>

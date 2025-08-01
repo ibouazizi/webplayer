@@ -1,0 +1,644 @@
+import { MediaPipeline } from './media.js';
+import dashjs from 'dashjs';
+
+/**
+ * AVPipeline class for handling DASH streaming and media decoding
+ * Integrates with MPEG_audio_spatial and MPEG_texture_video extensions
+ */
+export class AVPipeline extends MediaPipeline {
+    constructor(config = {}) {
+        super();
+        this.dashPlayer = null;
+        this.videoElement = null;
+        this.audioContext = null;
+        this.mediaSource = null;
+        this.videoDestination = null;
+        this.audioDestination = null;
+        this.isInitialized = false;
+        this.videoProcessingInterval = null;
+
+        // Store texture requirements from GLTF
+        this.textureRequirements = config.textureRequirements || {
+            width: 640,   // Default width if not specified
+            height: 360,  // Default height if not specified
+            format: 'RGBA',
+            frameSize: 640 * 360 * 4
+        };
+
+        // AVPipeline created
+    }
+
+    /**
+     * Initialize the pipeline with a DASH manifest URL
+     * @param {Object} config Configuration object
+     * @param {string} config.manifestUrl DASH manifest URL
+     * @param {Object} config.videoConfig Video configuration
+     * @param {Object} config.audioConfig Audio configuration
+     */
+    async initialize(config) {
+        
+        if (this.isInitialized) {
+            return;
+        }
+
+        // Store texture requirements from config if provided
+        if (config.textureRequirements) {
+            this.textureRequirements = {
+                ...this.textureRequirements,
+                ...config.textureRequirements
+            };
+        }
+
+        try {
+            // Create video element (hidden)
+            this.videoElement = document.createElement('video');
+            this.videoElement.style.display = 'none';
+            this.videoElement.playsInline = true;
+            this.videoElement.crossOrigin = 'anonymous';
+            this.videoElement.muted = true; // Start muted to allow autoplay
+            document.body.appendChild(this.videoElement);
+
+            // Add error listener to video element
+            this.videoElement.addEventListener('error', (e) => {
+            });
+
+            // Create play overlay
+            this.playOverlay = document.createElement('div');
+            this.playOverlay.className = 'play-overlay';
+            
+            this.playButton = document.createElement('button');
+            this.playButton.className = 'play-button';
+            this.playButton.textContent = 'Click to Play';
+            
+            this.playOverlay.appendChild(this.playButton);
+            document.body.appendChild(this.playOverlay);
+
+            // Initialize dash.js player
+            this.dashPlayer = dashjs.MediaPlayer().create();
+            
+            // Configure dash.js before initialization
+            this.dashPlayer.updateSettings({
+                streaming: {
+                    abr: {
+                        autoSwitchBitrate: {
+                            video: true,
+                            audio: true
+                        }
+                    },
+                    bufferToKeep: 30,
+                    bufferPruningInterval: 30,
+                    lowLatencyEnabled: true,
+                    // Use absolute URLs for segments
+                    baseURLResolver: () => new URL(config.manifestUrl).origin
+                },
+                debug: {
+                    logLevel: dashjs.Debug.LOG_LEVEL_DEBUG
+                }
+            });
+
+            // Add dash.js error handler
+            this.dashPlayer.on(dashjs.MediaPlayer.events.ERROR, (error) => {
+            });
+
+            // Initialize with manifest URL
+            this.dashPlayer.initialize(this.videoElement, config.manifestUrl, false); // Start paused
+
+            // Wait for dash.js to be ready
+            await new Promise((resolve, reject) => {
+                const timeout = setTimeout(() => {
+                    reject(new Error('Dash.js initialization timeout'));
+                }, 10000);
+
+                this.dashPlayer.on(dashjs.MediaPlayer.events.MANIFEST_LOADED, () => {
+                    clearTimeout(timeout);
+                    resolve();
+                });
+            });
+
+            // Wait for video metadata
+            await new Promise((resolve, reject) => {
+                const timeout = setTimeout(() => {
+                    reject(new Error('Video metadata timeout'));
+                }, 10000);
+
+                this.videoElement.addEventListener('loadedmetadata', () => {
+                    clearTimeout(timeout);
+                    resolve();
+                });
+            });
+
+            // Wait for user interaction
+            await new Promise(resolve => {
+                this.playButton.addEventListener('click', () => {
+                    this.playOverlay.classList.add('hidden');
+                    resolve();
+                });
+            });
+
+            // Set up audio context and nodes
+            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const mediaElementSource = this.audioContext.createMediaElementSource(this.videoElement);
+
+            // Create video processing canvas and context
+            const canvas = document.createElement('canvas');
+            canvas.style.position = 'fixed';
+            canvas.style.top = '10px';
+            canvas.style.right = '10px';
+            canvas.style.width = '320px';  // Smaller size for debugging
+            canvas.style.height = '180px';
+            canvas.style.border = '1px solid white';
+            canvas.style.zIndex = '9999';
+            document.body.appendChild(canvas);
+
+            const context = canvas.getContext('2d', {
+                willReadFrequently: true,
+                alpha: true,
+                desynchronized: false  // Need synchronous updates for video frames
+            });
+            
+            this.videoDestination = {
+                canvas: canvas,
+                context: context,
+                texture: null
+            };
+
+            // Set up event listeners
+            this.setupEventListeners();
+
+            this.isInitialized = true;
+
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /**
+     * Set up event listeners for dash.js and media elements
+     */
+    setupEventListeners() {
+        // Video element events
+        this.videoElement.addEventListener('play', () => {
+            this.startVideoProcessing();
+        });
+
+        this.videoElement.addEventListener('pause', () => {
+            this.stopVideoProcessing();
+        });
+
+        this.videoElement.addEventListener('ended', () => {
+            this.emit('ended');
+        });
+    }
+
+    /**
+     * Start processing video frames
+     */
+    startVideoProcessing() {
+            readyState: this.videoElement?.readyState,
+            paused: this.videoElement?.paused,
+            currentTime: this.videoElement?.currentTime,
+            videoWidth: this.videoElement?.videoWidth,
+            videoHeight: this.videoElement?.videoHeight
+        });
+
+        if (!this.videoProcessingInterval && this.videoElement.readyState >= 2) {
+            // Process video frames at the video's frame rate or 30fps if not available
+            const frameRate = this.dashPlayer.getVideoElement().playbackRate || 30;
+            
+            this.videoProcessingInterval = setInterval(() => {
+                this.processVideoFrame();
+            }, 1000 / frameRate);
+            
+        } else {
+            if (this.videoProcessingInterval) {
+            }
+            if (!(this.videoElement.readyState >= 2)) {
+            }
+        }
+    }
+
+    /**
+     * Stop processing video frames
+     */
+    stopVideoProcessing() {
+        
+        if (this.videoProcessingInterval) {
+            clearInterval(this.videoProcessingInterval);
+            this.videoProcessingInterval = null;
+        } else {
+        }
+    }
+
+    /**
+     * Process a single video frame
+     */
+    processVideoFrame() {
+            paused: this.videoElement?.paused,
+            ended: this.videoElement?.ended,
+            currentTime: this.videoElement?.currentTime,
+            readyState: this.videoElement?.readyState,
+            expectedDimensions: this.targetWidth && this.targetHeight ? 
+                `${this.targetWidth}x${this.targetHeight}` : 'not set'
+        });
+
+        if (!this.videoElement || this.videoElement.paused || this.videoElement.ended) {
+            return;
+        }
+
+        // Check if video has valid dimensions
+        const videoWidth = this.videoElement.videoWidth;
+        const videoHeight = this.videoElement.videoHeight;
+        
+        
+        if (!videoWidth || !videoHeight) {
+            return;
+        }
+
+        // Update canvas dimensions if needed
+        if (this.videoDestination.canvas.width !== videoWidth ||
+            this.videoDestination.canvas.height !== videoHeight) {
+            this.videoDestination.canvas.width = videoWidth;
+            this.videoDestination.canvas.height = videoHeight;
+        }
+
+        try {
+            // Draw video frame to canvas
+            this.videoDestination.context.drawImage(this.videoElement, 0, 0, videoWidth, videoHeight);
+
+            // Get frame data from canvas
+            const imageData = this.videoDestination.context.getImageData(
+                0, 0, videoWidth, videoHeight
+            );
+
+            // Convert to OpenCV matrix
+            const src = cv.matFromImageData(imageData);
+            
+            // Create destination matrix
+            const dst = new cv.Mat();
+            
+            // Use dimensions from GLTF texture requirements
+            const targetWidth = this.textureRequirements.width;
+            const targetHeight = this.textureRequirements.height;
+            const targetFormat = this.textureRequirements.format;
+            const targetFrameSize = this.textureRequirements.frameSize;
+            
+            // Skip processing if dimensions aren't properly set
+            if (!targetWidth || !targetHeight) {
+                    target: `${targetWidth}x${targetHeight}`,
+                    source: `${videoWidth}x${videoHeight}`,
+                    requirements: this.textureRequirements
+                });
+                return;
+            }
+
+                source: {
+                    width: videoWidth,
+                    height: videoHeight,
+                    size: videoWidth * videoHeight * 4
+                },
+                target: {
+                    width: targetWidth,
+                    height: targetHeight,
+                    format: targetFormat,
+                    frameSize: targetFrameSize
+                },
+                scaling: {
+                    x: targetWidth / videoWidth,
+                    y: targetHeight / videoHeight
+                }
+            });
+
+                width: this.textureRequirements.width,
+                height: this.textureRequirements.height,
+                format: this.textureRequirements.format,
+                frameSize: this.textureRequirements.frameSize,
+                source: {
+                    width: videoWidth,
+                    height: videoHeight
+                }
+            });
+
+                source: {
+                    width: videoWidth,
+                    height: videoHeight,
+                    aspectRatio: (videoWidth / videoHeight).toFixed(3),
+                    size: videoWidth * videoHeight * 4
+                },
+                target: {
+                    width: targetWidth,
+                    height: targetHeight,
+                    aspectRatio: (targetWidth / targetHeight).toFixed(3),
+                    size: this.frameSize
+                },
+                scaling: {
+                    x: (targetWidth / videoWidth).toFixed(3),
+                    y: (targetHeight / videoHeight).toFixed(3)
+                },
+                format: {
+                    input: 'RGBA',  // From canvas
+                    intermediate: 'RGB',  // After first conversion
+                    output: this.targetFormat  // From MPEG metadata
+                },
+                scale: {
+                    x: targetWidth / videoWidth,
+                    y: targetHeight / videoHeight
+                }
+            });
+
+            
+            // Convert color space from BGR to RGB
+            cv.cvtColor(src, dst, cv.COLOR_RGBA2RGB);
+                width: dst.cols,
+                height: dst.rows,
+                channels: dst.channels(),
+                type: dst.type(),
+                size: dst.data.length
+            });
+
+            // Create resized matrix
+            const resized = new cv.Mat();
+            const dsize = new cv.Size(targetWidth, targetHeight);
+            cv.resize(dst, resized, dsize, 0, 0, cv.INTER_LINEAR);
+                originalSize: `${dst.cols}x${dst.rows}`,
+                newSize: `${resized.cols}x${resized.rows}`,
+                channels: resized.channels(),
+                dataSize: resized.data.length,
+                expectedSize: targetWidth * targetHeight * resized.channels()
+            });
+            
+            // Convert to RGBA format for THREE.js
+            const rgba = new cv.Mat();
+            cv.cvtColor(resized, rgba, cv.COLOR_RGB2RGBA);
+                width: rgba.cols,
+                height: rgba.rows,
+                channels: rgba.channels(),
+                type: rgba.type(),
+                size: rgba.data.length,
+                expectedSize: targetWidth * targetHeight * 4
+            });
+            
+            // Get data from OpenCV matrix
+            const data = new Uint8Array(rgba.data);
+                size: data.length,
+                width: rgba.cols,
+                height: rgba.rows,
+                channels: rgba.channels(),
+                firstPixel: Array.from(data.slice(0, 4)),
+                lastPixel: Array.from(data.slice(-4))
+            });
+
+            // Clean up the resized matrix
+            resized.delete();
+            
+                dataLength: data.length,
+                width: rgba.cols,
+                height: rgba.rows,
+                format: 'RGBA',
+                channels: rgba.channels(),
+                type: rgba.type()
+            });
+
+            // Clean up OpenCV matrices
+            src.delete();
+            dst.delete();
+            rgba.delete();
+
+            this.emit('videoFrame', {
+                data: data,
+                width: targetWidth,
+                height: targetHeight
+            });
+        } catch (error) {
+        }
+    }
+
+    /**
+     * Connect the pipeline to a video texture
+     * @param {Object} textureExtension MPEG_texture_video extension instance
+     * @param {number} sourceId Source ID to connect to
+     */
+    connectVideoTexture(textureExtension, sourceId) {
+        
+        
+        // Get the texture first since it contains the MPEG metadata
+        const texture = textureExtension.textures.get(sourceId);
+        if (!texture) {
+            throw new Error(`Texture ${sourceId} not found`);
+        }
+
+        // Get MPEG texture information
+        const mpegInfo = texture.userData.mpegTextureInfo;
+
+        // Get the video source
+        this.videoSource = textureExtension.sources.get(sourceId);
+        if (!this.videoSource) {
+            throw new Error(`Video source ${sourceId} not found`);
+        }
+
+        // Store target dimensions from MPEG metadata
+        this.targetWidth = mpegInfo.width;
+        this.targetHeight = mpegInfo.height;
+        this.targetFormat = mpegInfo.format;
+        this.frameSize = mpegInfo.frameSize;
+
+            dimensions: `${this.targetWidth}x${this.targetHeight}`,
+            format: this.targetFormat,
+            frameSize: this.frameSize,
+            expectedBufferSize: this.frameSize * 2 // Double buffering
+        });
+
+        if (!this.targetWidth || !this.targetHeight) {
+                sourceId,
+                texture: texture,
+                userData: texture.userData
+            });
+            throw new Error('Target dimensions not found in texture');
+        }
+
+            sourceId,
+            hasBuffer: !!this.videoSource.bufferCircular,
+            bufferCapacity: this.videoSource.bufferCircular?.capacity(),
+            targetDimensions: `${this.targetWidth}x${this.targetHeight}`,
+            texture: {
+                width: this.targetWidth,
+                height: this.targetHeight,
+                format: texture.format,
+                type: texture.type,
+                colorSpace: texture.colorSpace
+            }
+        });
+
+        this.on('videoFrame', (frame) => {
+                width: frame.width,
+                height: frame.height,
+                dataLength: frame.data.length,
+                expectedSize: this.targetWidth * this.targetHeight * 4
+            });
+            
+            // Update texture data
+            if (this.videoSource?.bufferCircular) {
+                try {
+                    // Verify frame dimensions match target
+                    if (frame.width !== this.targetWidth || frame.height !== this.targetHeight) {
+                            frame: `${frame.width}x${frame.height}`,
+                            target: `${this.targetWidth}x${this.targetHeight}`
+                        });
+                        return;
+                    }
+
+                    const frameData = new Uint8Array(frame.data.buffer);
+                    const expectedSize = this.targetWidth * this.targetHeight * 4;
+
+                        size: frameData.length,
+                        dimensions: `${frame.width}x${frame.height}`,
+                        channels: 4,
+                        expectedSize: expectedSize,
+                        firstPixel: Array.from(frameData.slice(0, 4)),
+                        lastPixel: Array.from(frameData.slice(-4))
+                    });
+
+                        available: this.videoSource.bufferCircular.available_write(),
+                        capacity: this.videoSource.bufferCircular.capacity(),
+                        frameSize: expectedSize,
+                        framesCapacity: Math.floor(this.videoSource.bufferCircular.capacity() / expectedSize)
+                    });
+                    
+                    if (frameData.length !== expectedSize) {
+                            actual: frameData.length,
+                            expected: expectedSize,
+                            difference: frameData.length - expectedSize,
+                            dimensions: {
+                                width: frame.width,
+                                height: frame.height,
+                                channels: 4
+                            }
+                        });
+                        return;
+                    }
+                    
+                    const written = this.videoSource.bufferCircular.push(frameData);
+                        bytesWritten: written,
+                        expectedBytes: expectedSize,
+                        success: written === expectedSize,
+                        remainingSpace: this.videoSource.bufferCircular.available_write(),
+                        framesRemaining: Math.floor(this.videoSource.bufferCircular.available_write() / expectedSize)
+                    });
+                } catch (error) {
+                }
+            } else {
+            }
+        });
+    }
+
+    /**
+     * Connect the pipeline to an audio spatial source
+     * @param {Object} audioExtension MPEG_audio_spatial extension instance
+     * @param {number} sourceId Source ID to connect to
+     */
+    connectAudioSource(audioExtension, sourceId) {
+        const source = audioExtension.sources.get(sourceId);
+        if (!source) {
+            throw new Error(`Audio source ${sourceId} not found`);
+        }
+
+        // Create audio processing nodes
+        const mediaElementSource = this.audioContext.createMediaElementSource(this.videoElement);
+        
+        // Connect to the audio extension's gain node
+        mediaElementSource.connect(source.gainNode);
+
+        // If it's an object source, connect through the panner
+        if (source.type === 'Object' && source.panner) {
+            source.gainNode.connect(source.panner);
+            source.panner.connect(this.audioContext.destination);
+        } 
+        // If it's an HOA source, connect through the HOA renderer
+        else if (source.type === 'HOA' && source.hoaNode) {
+            source.gainNode.connect(source.hoaNode);
+            source.hoaNode.connect(this.audioContext.destination);
+        }
+    }
+
+    /**
+     * Start playback
+     */
+    async play() {
+        if (this.videoElement) {
+            try {
+                await this.videoElement.play();
+            } catch (error) {
+                // If autoplay was blocked, show the play button again
+                if (error.name === 'NotAllowedError') {
+                    this.playOverlay.classList.remove('hidden');
+                }
+                throw error;
+            }
+        }
+    }
+
+    /**
+     * Pause playback
+     */
+    pause() {
+        if (this.videoElement) {
+            this.videoElement.pause();
+        }
+    }
+
+    /**
+     * Seek to a specific time
+     * @param {number} time Time in seconds
+     */
+    seek(time) {
+        if (this.videoElement) {
+            this.videoElement.currentTime = time;
+        }
+    }
+
+    /**
+     * Get current playback time
+     * @returns {number} Current time in seconds
+     */
+    getCurrentTime() {
+        return this.videoElement ? this.videoElement.currentTime : 0;
+    }
+
+    /**
+     * Clean up resources
+     */
+    dispose() {
+        this.stopVideoProcessing();
+
+        if (this.dashPlayer) {
+            this.dashPlayer.reset();
+            this.dashPlayer = null;
+        }
+
+        if (this.videoElement) {
+            this.videoElement.remove();
+            this.videoElement = null;
+        }
+
+        if (this.audioContext) {
+            this.audioContext.close();
+            this.audioContext = null;
+        }
+
+        if (this.videoDestination) {
+            this.videoDestination.canvas = null;
+            this.videoDestination.context = null;
+            this.videoDestination.texture = null;
+        }
+
+        if (this.playOverlay) {
+            this.playOverlay.remove();
+            this.playOverlay = null;
+        }
+
+        if (this.playButton) {
+            this.playButton = null;
+        }
+
+        this.isInitialized = false;
+    }
+}
